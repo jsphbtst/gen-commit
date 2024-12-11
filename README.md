@@ -4,6 +4,13 @@ This repo creates a custom git alias that integrates either Anthropic or a local
 
 I crapped this in an hour so improvements are definitely on the way.
 
+## System Requirements
+
+- Git (duh)
+- Node.js v20+ (alongside npm)
+- Bun v1.1.9+
+- Ollama
+
 ## Usage
 
 Run `./use.sh` to add `gen-commit` to your gitconfig.
