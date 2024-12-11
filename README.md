@@ -13,7 +13,7 @@ I crapped this in an hour so improvements are definitely on the way.
 
 ## Usage
 
-Run `./use.sh` to add `gen-commit` to your gitconfig.
+Run `./use.sh` to both add `gen-commit` to your gitconfig and to install the necessary Node dependencies.
 
 In any folder that's part of a Git repository, just run `git gen-commit` and the LLM will analyze the diff and generate a commit message for you. If you'd like to use Anthropic, run `git gen-commit --use-anthropic`.
 
