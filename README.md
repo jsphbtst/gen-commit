@@ -12,6 +12,6 @@ In any folder that's part of a Git repository, just run `git gen-commit` and the
 
 ## TODOs:
 
-[] Chunk processing of bigger diffs
-[] Manage configs to specify which Ollama model to use
-[] Add more flags for other LLMs (OpenAI, xAI, Gemini, et al.)
+- [ ] Chunk processing of bigger diffs
+- [ ] Manage configs to specify which Ollama model to use
+- [ ] Add more flags for other LLMs (OpenAI, xAI, Gemini, et al.)
