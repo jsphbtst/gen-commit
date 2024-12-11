@@ -16,6 +16,7 @@ main() {
   fi
 
   SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+  npm install
   git config --global alias.gen-commit "!${SCRIPT_DIR}/run.sh"
   echo "Successfully added 'gen-commit' as a Git alias"
 }
