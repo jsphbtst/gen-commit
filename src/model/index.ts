@@ -105,4 +105,9 @@ export class Model {
 
     process.stdout.write('\n')
   }
+
+  static async getTokenLength(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
+    const model = this.getInstance(useAnthropic)
+    return await model.llm.getNumTokens(input)
+  }
 }
