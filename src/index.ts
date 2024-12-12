@@ -38,7 +38,14 @@ async function main() {
   }
 
   const diffFilesText = await $`git -C ${directory} diff --name-only`.text()
-  const diffFiles = diffFilesText.trim().split('\n')
+  const diffFiles = diffFilesText
+    .trim()
+    .split('\n')
+    .filter(a => !!a?.length)
+  if (diffFiles.length < 1) {
+    console.log('No diffs to process')
+    return
+  }
 
   const summaryPromises: Promise<string>[] = []
   for (let idx = 0; idx < diffFiles.length; idx++) {
