@@ -1,6 +1,22 @@
 import { $ } from 'bun'
 import { Model } from './model'
 
+async function processGitFileDiff(
+  file: string,
+  directory: string,
+  useAnthropic = false
+): Promise<string> {
+  try {
+    const diff = await $`git -C ${directory} diff ${file}`.text()
+    console.log(`Summarizing diff for ${file}...`)
+    const summary = Model.summarize(diff)
+    return summary
+  } catch (e) {
+    console.error(e)
+    return ''
+  }
+}
+
 async function main() {
   const directory = process.argv[3]
 
@@ -27,9 +43,7 @@ async function main() {
   const summaryPromises: Promise<string>[] = []
   for (let idx = 0; idx < diffFiles.length; idx++) {
     const file = diffFiles[idx]
-    const diff = await $`git -C ${directory} diff ${file}`.text()
-    console.log(`Summarizing diff for ${file}...`)
-    summaryPromises.push(Model.summarize(diff))
+    summaryPromises.push(processGitFileDiff(file, directory, useAnthropic))
   }
 
   const summaries = await Promise.all(summaryPromises)
