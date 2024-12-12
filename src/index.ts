@@ -21,8 +21,22 @@ async function main() {
     process.exit(0)
   }
 
-  const diff = await $`git -C ${directory} diff`.text()
-  await Model.invoke(diff, useAnthropic)
+  const diffFilesText = await $`git -C ${directory} diff --name-only`.text()
+  const diffFiles = diffFilesText.trim().split('\n')
+
+  const summaryPromises: Promise<string>[] = []
+  for (let idx = 0; idx < diffFiles.length; idx++) {
+    const file = diffFiles[idx]
+    const diff = await $`git -C ${directory} diff ${file}`.text()
+    console.log(`Summarizing diff for ${file}...`)
+    summaryPromises.push(Model.summarize(diff))
+  }
+
+  const summaries = await Promise.all(summaryPromises)
+  const combinedSummaries = summaries.join('\n')
+
+  console.log('Generating combined summaries...\n')
+  await Model.finalSummarization(combinedSummaries)
 }
 
 await main()

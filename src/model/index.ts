@@ -10,6 +10,7 @@ export class Model {
   private static instance: Model | null = null
   private llm: ChatOllama | ChatAnthropic
   private chain: RunnableSequence
+  private finalSummary: RunnableSequence
 
   private constructor(useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
     this.llm = useAnthropic
@@ -55,6 +56,21 @@ export class Model {
       this.llm,
       new StringOutputParser()
     ])
+
+    const finalSummaryPrompt = ChatPromptTemplate.fromTemplate(`
+      You are a senior software engineer tasked to create a single one-sentence commit message out of a paragraph given to you that may consist of combined commit messages.
+
+      Generate said commit messages that capture the essence of the body of text: {input}
+
+      Respond with exactly the commit message with neither preamble nor explanation.
+    `)
+
+    this.finalSummary = RunnableSequence.from([
+      input => ({ input }),
+      finalSummaryPrompt,
+      this.llm,
+      new StringOutputParser()
+    ])
   }
 
   private static getInstance(useAnthropic: boolean = USE_ANTHROPIC_DEFAULT): Model {
@@ -65,19 +81,24 @@ export class Model {
     return this.instance
   }
 
+  static async summarize(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
+    const model = this.getInstance(useAnthropic)
+    const output = await model.chain.invoke(input)
+    return output
+  }
+
   static async *stream(input: string) {
     const model = this.getInstance()
-    const stream = await model.chain.stream(input)
+    const stream = await model.finalSummary.stream(input)
 
     for await (const chunk of stream) {
       yield chunk
     }
   }
 
-  static async invoke(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
+  static async finalSummarization(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
     const model = this.getInstance(useAnthropic)
     const stream = await model.chain.stream(input)
-
     for await (const chunk of stream) {
       process.stdout.write(chunk)
     }
