@@ -1,5 +1,6 @@
 import { $ } from 'bun'
 import { Model } from './model'
+import { MIN_DIFF_FILES } from './constants'
 
 async function processGitFileDiff(
   file: string,
@@ -42,7 +43,7 @@ async function main() {
     .trim()
     .split('\n')
     .filter(a => !!a?.length)
-  if (diffFiles.length < 1) {
+  if (diffFiles.length < MIN_DIFF_FILES) {
     console.log('No diffs to process')
     return
   }
