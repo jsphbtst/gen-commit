@@ -9,7 +9,7 @@ async function processGitFileDiff(
   try {
     const diff = await $`git -C ${directory} diff ${file}`.text()
     console.log(`Summarizing diff for ${file}...`)
-    const summary = Model.summarize(diff)
+    const summary = Model.summarize(diff, useAnthropic)
     return summary
   } catch (e) {
     console.error(e)

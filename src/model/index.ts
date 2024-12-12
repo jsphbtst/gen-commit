@@ -62,7 +62,7 @@ export class Model {
 
       Generate said commit messages that capture the essence of the body of text: {input}
 
-      Respond with exactly the commit message with neither preamble nor explanation.
+      Respond with exactly a one-sentence commit message with neither preamble nor explanation.
     `)
 
     this.finalSummary = RunnableSequence.from([
