@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const ProviderSchema = z.enum(['ollama', 'anthropic', 'xai']).default('ollama')
+export const ProviderSchema = z.enum(['ollama', 'anthropic', 'xai', 'openai']).default('ollama')
 
 export const ArgsSchema = z.object({
   pwd: z.string(),

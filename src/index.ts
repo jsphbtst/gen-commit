@@ -13,7 +13,7 @@ const rawArgs = yargs(hideBin(process.argv))
     },
     provider: {
       type: 'string',
-      choices: ['ollama', 'anthropic', 'xai'],
+      choices: ['ollama', 'anthropic', 'xai', 'openai'],
       default: 'ollama',
       describe: 'AI model provider to use'
     }
@@ -30,6 +30,7 @@ async function processGitFileDiff(
   try {
     const diff = await $`git -C ${directory} diff ${file}`.text()
     console.log(`Summarizing diff for ${file}...`)
+    // This magic number should really be dynamically set somehow but too lazy rn - J
     const summary = await Model.summarize(diff.slice(0, 300), provider)
     return summary
   } catch (e) {

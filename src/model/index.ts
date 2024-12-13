@@ -1,6 +1,7 @@
 import { ChatOllama } from '@langchain/ollama'
 import { ChatAnthropic } from '@langchain/anthropic'
 import { ChatXAI } from '@langchain/xai'
+import { ChatOpenAI } from '@langchain/openai'
 import { RunnableSequence } from '@langchain/core/runnables'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { StringOutputParser } from '@langchain/core/output_parsers'
@@ -17,9 +18,13 @@ export class Model {
       this.llm = new ChatAnthropic({
         apiKey: process.env.ANTHROPIC_API_KEY
       })
-    } else if (provider == 'xai') {
+    } else if (provider === 'xai') {
       this.llm = new ChatXAI({
         apiKey: process.env.XAI_API_KEY
+      })
+    } else if (provider === 'openai') {
+      this.llm = new ChatOpenAI({
+        apiKey: process.env.OPENAI_API_KEY
       })
     } else {
       this.llm = new ChatOllama({

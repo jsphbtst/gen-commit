@@ -1,8 +1,6 @@
 # gen-commit alias
 
-This repo creates a custom git alias that integrates either Anthropic or a local Ollama instance running Llama3.2 to generate commit messages given a diff.
-
-I crapped this in an hour so improvements are definitely on the way.
+This repo creates a custom git alias that integrates from select LLM providers to generate commit messages given a diff. Lazy man's commit message generator, if you will.
 
 ## System Requirements
 
@@ -22,6 +20,7 @@ If you'd like to specify a specific LLM provider, we currently have three suppor
 - ollama
 - xai
 - anthropic
+- openai
 
 Your command would then look something like this: `git gen-commit --provider=xai`. Not providing the `provider` arg defaults to your local running Ollama instance: `git gen-commit`.
 
