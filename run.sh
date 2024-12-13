@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROVIDER="ollama"
 
 check_node() {
   if ! command -v node &> /dev/null; then
@@ -38,13 +39,19 @@ check_node_modules() {
   fi
 }
 
-check_use_anthropic() {
-  for arg in "$@"; do
-    if [ "$arg" = "--use-anthropic" ]; then
-      return 0  # true
-    fi
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --provider=*)
+        PROVIDER="${1#*=}"
+        shift
+        ;;
+      *)
+      # Unknown option - J
+      shift
+      ;;
+    esac
   done
-  return 1  # false
 }
 
 main() {
@@ -53,19 +60,15 @@ main() {
   check_package_json
   check_node_modules
 
-  _USE_ANTHROPIC=false
-  check_use_anthropic "$@" && _USE_ANTHROPIC=true
-
-  # Only check ollama if we're not using Anthropic
-  $_USE_ANTHROPIC || check_ollama
   original_pwd=$PWD
+  parse_args "$@"
+
+  if [ "$PROVIDER" == "ollama" ]; then
+   check_ollama
+  fi
 
   cd "$SCRIPT_DIR"
-  if $_USE_ANTHROPIC; then
-    npm start --silent -- --pwd "$original_pwd" --use-anthropic 1
-  else
-    npm start --silent -- --pwd "$original_pwd"
-  fi
+  npm start --silent -- --pwd "$original_pwd" --provider "$PROVIDER"
 }
 
 main "$@"

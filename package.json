@@ -19,8 +19,10 @@
     "@langchain/community": "^0.3.18",
     "@langchain/langgraph": "^0.2.32",
     "@langchain/ollama": "^0.1.2",
+    "@langchain/xai": "^0.0.1",
     "bun": "^1.1.38",
     "langchain": "^0.3.7",
+    "yargs": "^17.7.2",
     "zod": "^3.24.1"
   }
 }

@@ -15,10 +15,18 @@ I crapped this in an hour so improvements are definitely on the way.
 
 Run `./use.sh` to both add `gen-commit` to your gitconfig and to install the necessary Node dependencies.
 
-In any folder that's part of a Git repository, just run `git gen-commit` and the LLM will analyze the diff and generate a commit message for you. If you'd like to use Anthropic, run `git gen-commit --use-anthropic`.
+In any folder that's part of a Git repository, just run `git gen-commit` and the LLM will analyze the diff and generate a commit message for you.
+
+If you'd like to specify a specific LLM provider, we currently have three supported:
+
+- ollama
+- xai
+- anthropic
+
+Your command would then look something like this: `git gen-commit --provider=xai`. Not providing the `provider` arg defaults to your local running Ollama instance: `git gen-commit`.
 
 ## TODOs:
 
 - [x] Chunk processing of bigger diffs
-- [ ] Manage configs to specify which Ollama model to use
-- [ ] Add more flags for other LLMs (OpenAI, xAI, Gemini, et al.)
+- [ ] Manage configs to specify which LLM model to use
+- [x] Add more flags for other LLMs (OpenAI, xAI, Gemini, et al.)

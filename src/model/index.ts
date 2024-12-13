@@ -1,26 +1,32 @@
 import { ChatOllama } from '@langchain/ollama'
 import { ChatAnthropic } from '@langchain/anthropic'
+import { ChatXAI } from '@langchain/xai'
 import { RunnableSequence } from '@langchain/core/runnables'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 import { StringOutputParser } from '@langchain/core/output_parsers'
-
-const USE_ANTHROPIC_DEFAULT = false
+import { type TProviders } from '../schema'
 
 export class Model {
   private static instance: Model | null = null
-  private llm: ChatOllama | ChatAnthropic
+  private llm: ChatOllama | ChatAnthropic | ChatXAI
   private chain: RunnableSequence
   private finalSummary: RunnableSequence
 
-  private constructor(useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
-    this.llm = useAnthropic
-      ? new ChatAnthropic({
-          apiKey: process.env.ANTHROPIC_API_KEY
-        })
-      : new ChatOllama({
-          baseUrl: 'http://localhost:11434',
-          model: 'llama3.2'
-        })
+  private constructor(provider: TProviders) {
+    if (provider === 'anthropic') {
+      this.llm = new ChatAnthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY
+      })
+    } else if (provider == 'xai') {
+      this.llm = new ChatXAI({
+        apiKey: process.env.XAI_API_KEY
+      })
+    } else {
+      this.llm = new ChatOllama({
+        baseUrl: 'http://localhost:11434',
+        model: 'llama3.2'
+      })
+    }
 
     const identifierPrompt = ChatPromptTemplate.fromTemplate(`
       You are the world's best programming language classifier model. When you see code snippets form a
@@ -58,7 +64,8 @@ export class Model {
     ])
 
     const finalSummaryPrompt = ChatPromptTemplate.fromTemplate(`
-      You are a senior software engineer tasked to create a single one-sentence commit message out of a paragraph given to you that may consist of combined commit messages.
+      You are a senior software engineer tasked to create a single one-sentence commit message out of a paragraph given to you that may consist of combined commit messages. No new lines or making the commit
+      message in the style of a list, just one sentence.
 
       Generate said commit messages that capture the essence of the body of text: {input}
 
@@ -73,22 +80,22 @@ export class Model {
     ])
   }
 
-  private static getInstance(useAnthropic: boolean = USE_ANTHROPIC_DEFAULT): Model {
+  private static getInstance(provider: TProviders): Model {
     if (!this.instance) {
-      this.instance = new Model(useAnthropic)
+      this.instance = new Model(provider)
     }
 
     return this.instance
   }
 
-  static async summarize(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
-    const model = this.getInstance(useAnthropic)
+  static async summarize(input: string, provider: TProviders) {
+    const model = this.getInstance(provider)
     const output = await model.chain.invoke(input)
     return output
   }
 
-  static async *stream(input: string) {
-    const model = this.getInstance()
+  static async *stream(input: string, provider: TProviders) {
+    const model = this.getInstance(provider)
     const stream = await model.finalSummary.stream(input)
 
     for await (const chunk of stream) {
@@ -96,8 +103,16 @@ export class Model {
     }
   }
 
-  static async finalSummarization(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
-    const model = this.getInstance(useAnthropic)
+  static async finalSummarization(input: string, provider: TProviders) {
+    const model = this.getInstance(provider)
+
+    // TODO: Can't get streaming to properly work yet for some reason - J
+    if (provider === 'xai') {
+      const response = await model.chain.invoke(input)
+      console.log(response)
+      return
+    }
+
     const stream = await model.chain.stream(input)
     for await (const chunk of stream) {
       process.stdout.write(chunk)
@@ -106,8 +121,8 @@ export class Model {
     process.stdout.write('\n')
   }
 
-  static async getTokenLength(input: string, useAnthropic: boolean = USE_ANTHROPIC_DEFAULT) {
-    const model = this.getInstance(useAnthropic)
+  static async getTokenLength(input: string, provider: TProviders) {
+    const model = this.getInstance(provider)
     return await model.llm.getNumTokens(input)
   }
 }
